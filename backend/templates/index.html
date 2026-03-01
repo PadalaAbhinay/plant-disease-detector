@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌾 RYTHU SEVA - Plant Disease Detector</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    
+    .tagline {
+      font-size: 1.2em;
+      opacity: 0.9;
+      margin-top: 5px;
+    }
+    
+    .upload-area {
+      padding: 40px;
+      text-align: center;
+    }
+    
+    .upload-box {
+      border: 3px dashed #2e7d32;
+      padding: 60px 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #f8f9fa;
+    }
+    
+    .upload-box:hover {
+      border-color: #1b5e20;
+      background: #e8f5e9;
+    }
+    
+    .upload-box i {
+      font-size: 4em;
+      color: #2e7d32;
+      margin-bottom: 15px;
+    }
+    
+    input[type="file"] {
+      display: none;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+      color: white;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(46, 125, 50, 0.4);
+    }
+    
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .btn-buy {
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      margin-top: 10px;
+      padding: 10px 30px;
+    }
+    
+    .btn-buy:hover {
+      box-shadow: 0 5px 20px rgba(255, 152, 0, 0.4);
+    }
+    
+    #result {
+      padding: 30px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-top: 20px;
+      display: none;
+    }
+    
+    #result.show {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .result-title {
+      font-size: 1.5em;
+      color: #2e7d32;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .result-row {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+    }
+    
+    .result-image {
+      flex: 1;
+    }
+    
+    .result-image img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .result-details {
+      flex: 1;
+    }
+    
+    .disease-label {
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #1b5e20;
+      margin-bottom: 10px;
+    }
+    
+    .disease-name {
+      font-size: 1.8em;
+      color: #d32f2f;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    
+    .treatment-label {
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #1b5e20;
+      margin-bottom: 10px;
+    }
+    
+    .treatment-text {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #2e7d32;
+      line-height: 1.6;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #2e7d32;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 0.9em;
+      background: #f5f5f5;
+    }
+    
+    .slogan {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #2e7d32;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🌾 RYTHU SEVA 🌾</h1>
+      <p class="tagline">Real-Time Plant Disease Detection for Paddy Crops</p>
+      <p class="slogan">JAI JAWAN! JAI KISAN!</p>
+    </header>
+    
+    <div class="upload-area">
+      <div class="upload-box" id="dropZone">
+        <div id="previewContainer">
+          <div>📷</div>
+          <h3>Scan Paddy Leaf - Upload Image</h3>
+          <p style="margin-top: 10px; color: #666;">Click to Upload or Drag & Drop (JPG, PNG)</p>
+        </div>
+        <input type="file" id="imageUpload" accept="image/*" />
+      </div>
+      
+      <button class="btn" id="detectBtn" onclick="predictDisease()" disabled>SCAN & DETECT DISEASE</button>
+      
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px; font-weight: bold;">Analyzing leaf... Please wait</p>
+      </div>
+    </div>
+    
+    <div id="result" class="result">
+      <h2 class="result-title">Disease Detection Result</h2>
+      <div class="result-row">
+        <div class="result-image">
+          <img id="uploadedImage" src="" alt="Uploaded Leaf" />
+        </div>
+        <div class="result-details">
+          <div class="disease-label">Detected Disease:</div>
+          <div class="disease-name" id="diseaseName">Loading...</div>
+          
+          <div class="treatment-label" style="margin-top: 20px;">Recommended Treatment:</div>
+          <div class="treatment-text" id="treatmentAdvice">Loading...</div>
+          
+          <button class="btn btn-buy" onclick="buyPesticides()">
+            🛒 BUY PESTICIDES NOW - 24 HOURS DELIVERY
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <p>🌱 Helping Farmers Protect Their Crops with AI Technology</p>
+      <p>Presented by: CHINTHALA.CHANDU</p>
+    </footer>
+  </div>
+
+  <script>
+    let selectedFile = null;
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('imageUpload');
+    const detectBtn = document.getElementById('detectBtn');
+    const previewContainer = document.getElementById('previewContainer');
+    const resultDiv = document.getElementById('result');
+    const loadingDiv = document.getElementById('loading');
+
+    // Click to upload
+    dropZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // File selection
+    fileInput.addEventListener('change', (e) => {
+      handleFileSelection(e.target.files[0]);
+    });
+
+    // Drag and drop
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#1b5e20';
+      dropZone.style.backgroundColor = '#e8f5e9';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.style.borderColor = '#2e7d32';
+      dropZone.style.backgroundColor = '#f8f9fa';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#2e7d32';
+      dropZone.style.backgroundColor = '#f8f9fa';
+      
+      if (e.dataTransfer.files.length) {
+        handleFileSelection(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFileSelection(file) {
+      if (!file) return;
+      
+      selectedFile = file;
+      detectBtn.disabled = false;
+      
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewContainer.innerHTML = `
+          <img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 8px;" />
+          <p style="margin-top: 10px; font-weight: bold;">${file.name}</p>
+        `;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function predictDisease() {
+      if (!selectedFile) {
+        alert("Please select an image first!");
+        return;
+      }
+
+      // Show loading
+      loadingDiv.style.display = 'block';
+      detectBtn.disabled = true;
+      resultDiv.classList.remove('show');
+
+      const formData = new FormData();
+      formData.append('image', selectedFile);
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        
+        if (result.error) {
+          alert("Error: " + result.error);
+          return;
+        }
+
+        // Update result display
+        document.getElementById('diseaseName').innerText = result.disease;
+        document.getElementById('treatmentAdvice').innerText = result.treatment;
+        document.getElementById('uploadedImage').src = result.image_path;
+        
+        // Show result with animation
+        setTimeout(() => {
+          resultDiv.classList.add('show');
+          loadingDiv.style.display = 'none';
+          detectBtn.disabled = false;
+        }, 300);
+
+      } catch (err) {
+        console.error(err);
+        alert("Failed to process image. Please try again.");
+        loadingDiv.style.display = 'none';
+        detectBtn.disabled = false;
+      }
+    }
+    
+    function buyPesticides() {
+      const disease = document.getElementById('diseaseName').innerText;
+      alert(`🛒 Order placed for ${disease} treatment!\n\n✅ Pesticides will be delivered to your field within 24 hours!\n\nThank you for using RYTHU SEVA! 🌾`);
+    }
+  </script>
+</body>
+</html>

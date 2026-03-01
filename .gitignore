@@ -1,0 +1,5 @@
+venv/
+__pycache__/
+*.pyc
+logs/
+backend/data/plant-disease-dataset/
